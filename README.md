@@ -29,6 +29,24 @@ Some prompts to answer:
 
 You can include a simple diagram or bullet list if helpful.
 
+The recommender system utilizes genre, mood, energy, tempo_bpm, valence, danceability, and acousticness.
+The UserProfile will store favorite genre, preferred mood, and an overall numeric taste vector.
+The recommender will be a multi scale loss function computing a weighted average of UserProfile and Song features.
+
+Categorical match (e.g., genre and mood):
+If song's genre matches user's favorite genre → add high weight (e.g., 0.4 points)
+If song's mood matches user's preferred mood → add high weight (e.g., 0.3 points)
+Partial matches or related categories get lower scores (e.g., 0.1-0.2)
+
+Numeric similarity (audio attributes):
+For each numeric feature (energy, tempo, valence, etc.), compute distance from user's target
+Convert distance to similarity: similarity = 1 - normalized_distance (closer = higher score)
+Weight each similarity (e.g., energy 0.2, tempo 0.15, valence 0.15, danceability 0.1, acousticness 0.1)
+total_score = (genre_weight * genre_match) + (mood_weight * mood_match) + sum(numeric_weights * numeric_similarities)
+
+
+The songs we choose will be closest in vectorized similarity distance from the input song.
+
 ---
 
 ## Getting Started
@@ -139,6 +157,16 @@ Describe your scoring logic in plain language.
 - How does it turn those into a number
 
 Try to avoid code in this section, treat it like an explanation to a non programmer.
+
+The scoring logic is a multi angle mechanism looking at categorical matching as well as audio feature similarity.
+More specifically 
+
+Total Score = (0.4 × genre_match) + (0.3 × mood_match) + 
+              (0.2 × energy_similarity) + (0.15 × tempo_similarity) + 
+              (0.15 × valence_similarity) + (0.1 × danceability_similarity) + 
+              (0.1 × acousticness_similarity)
+
+I think this system is weighing too much on audio attributes and not enough on user to user taste.
 
 ---
 
